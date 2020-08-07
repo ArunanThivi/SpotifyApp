@@ -1,0 +1,61 @@
+<html>
+    <head>        
+      <link rel="stylesheet" href="css/master.css">
+    </head>
+    <body>
+        <div id="songForm">
+            Text
+            <form id="songs" action="" method="POST">            
+                <input type="text" name="song1" class='inputBox'>
+                <button type="button" form = 'songs' onClick='addLine()' id='newLine'>New Song</button><br>
+            </form>        
+            <button type="button" form = 'songs' onClick='tokenTest()' id='Submit'>Submit</button>
+        </div>        
+        <script src="js/app.js"></script>
+        <script>
+            var counter = 2;
+            function addLine() {
+                console.log(counter);
+                if (counter < 6) {
+                    var line = `<input type="text" name="song${counter}" class="inputBox">`;
+                    const button = "<button type='button' form = 'songs' onClick='addLine()' id='newLine'>New Song</button><br>";
+                    document.getElementById('newLine').remove();
+                    document.getElementById('songs').insertAdjacentHTML('beforeend', line);
+                    document.getElementById('songs').insertAdjacentHTML('beforeend', button);
+                }
+                if (counter == 6) {
+                    alert("Song Limit Reached");
+                }                               
+                counter++;
+            }
+
+
+            function getSongs() {
+                var form = new FormData(document.querySelector("form"))
+                let text = ""
+                for (var song of form.values()){
+                    text += song + "<br>";
+                }
+                return text
+            }
+
+            async function displayText(text) {
+                var form = new FormData(document.querySelector("form"))
+                for (var song of form.values()){
+                    var obj = await APIController.searchTrack(song);
+                    obj = obj.tracks.items[0];
+                    console.log(obj);
+                    var album = obj.album.name;
+                    var cover = obj.album.images[1].url;
+                    var artist = obj.artists[0].name;
+                }
+                document.write(`<img src=${cover}><br>Artist: ${artist}<br> Album: ${album}`)
+            }
+            function tokenTest(){
+                var token = APIController.getToken();
+                console.log(token);
+
+            }
+        </script>
+    </body>
+</html>
