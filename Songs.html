@@ -9,13 +9,15 @@
                 <input type="text" name="song1" class='inputBox'>
                 <button type="button" form = 'songs' onClick='addLine()' id='newLine'>New Song</button><br>
             </form>        
-            <button type="button" form = 'songs' onClick='tokenTest()' id='Submit'>Submit</button>
+            <button type="button" form = 'songs' onClick='getSongs()' id='submit'>Submit</button>
         </div>        
         <script src="js/app.js"></script>
         <script>
+            var access_token = getHashParams().access_token;
+            var ids = '';
+            var songs = {}
             var counter = 2;
             function addLine() {
-                console.log(counter);
                 if (counter < 6) {
                     var line = `<input type="text" name="song${counter}" class="inputBox">`;
                     const button = "<button type='button' form = 'songs' onClick='addLine()' id='newLine'>New Song</button><br>";
@@ -29,33 +31,30 @@
                 counter++;
             }
 
-
-            function getSongs() {
-                var form = new FormData(document.querySelector("form"))
-                let text = ""
-                for (var song of form.values()){
-                    text += song + "<br>";
-                }
-                return text
-            }
-
-            async function displayText(text) {
-                var form = new FormData(document.querySelector("form"))
-                for (var song of form.values()){
-                    var obj = await APIController.searchTrack(song);
+            async function getSongs() {
+                var output = '';
+                var form = new FormData(document.querySelector("form"));
+                for (var song of form.values()) {
+                    var obj = await APIController.searchTrack(access_token, song);
                     obj = obj.tracks.items[0];
-                    console.log(obj);
+                    songs[song] = obj;
                     var album = obj.album.name;
-                    var cover = obj.album.images[1].url;
+                    var cover = obj.album.images[2].url;
                     var artist = obj.artists[0].name;
+                    var id = obj.id;
+                    ids += id+',';
+                    var features = await APIController.multiFeatures(access_token, ids);
+                    output += `<img src=${cover}><br>Artist: ${artist}<br> Album: ${album}<br>`;
                 }
-                document.write(`<img src=${cover}><br>Artist: ${artist}<br> Album: ${album}`)
+                console.log(songs);                
+                console.log(features);
+                displayText(output);
             }
-            function tokenTest(){
-                var token = APIController.getToken();
-                console.log(token);
 
+            function displayText(output) {
+                document.write(output);
             }
+
         </script>
     </body>
 </html>
