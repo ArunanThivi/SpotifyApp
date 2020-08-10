@@ -1,4 +1,24 @@
 const APIController = (function() {
+
+    const _getProfile = async(token) => {
+        const result = await fetch(`https://api.spotify.com/v1/me`, {
+            method: 'GET',
+            headers: { 'Authorization': 'Bearer ' + token },
+        });
+
+        const data = await result.json();
+        return data;
+    }
+
+    const _topTracks = async(token) => {
+        const result = await fetch(`https://api.spotify.com/v1/me/top/tracks?limit=50`, {
+            method: 'GET',
+            headers: { 'Authorization': 'Bearer ' + token },
+        });
+
+        const data = await result.json();
+        return data;
+    }
  
     const _searchTrack = async(token, name) => {
         var trackName = name.replace(' /g', '%20');
@@ -40,6 +60,12 @@ const APIController = (function() {
         },
         multiFeatures(token, ids) {
             return _multifeatures(token, ids);
+        },
+        getProfile(token) {
+            return _getProfile(token);
+        },
+        topTracks(token) {
+            return _topTracks(token);
         }
     }
 
@@ -91,7 +117,7 @@ function combineStats(songs) {
         features.valence += song.valence;
     }
     for (let item in features) {
-        features[item] /= numItems;
+        features[item] = parseFloat((features[item] / numItems).toFixed(5));
     }    
     console.log(features);
 }
