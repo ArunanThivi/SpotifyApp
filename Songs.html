@@ -7,9 +7,9 @@
             Text
             <form id="songs" action="" method="POST">            
                 <input type="text" name="song1" class='inputBox'>
-                <button type="button" form = 'songs' onClick='addLine()' id='newLine'>New Song</button><br>
+                <button type="button" form = 'songs' onClick='addLine()' id='newLine-button'>New Song</button><br>
             </form>        
-            <button type="button" form = 'songs' onClick='getSongs()' id='submit'>Submit</button>
+            <button type="button" form = 'songs' onClick='main()' id='submit'>Submit</button>
         </div>        
         <script src="js/app.js"></script>
         <script>
@@ -19,11 +19,12 @@
             var counter = 2;
             function addLine() {
                 if (counter < 6) {
-                    var line = `<input type="text" name="song${counter}" class="inputBox">`;
-                    const button = "<button type='button' form = 'songs' onClick='addLine()' id='newLine'>New Song</button><br>";
-                    document.getElementById('newLine').remove();
+                    var line = `<input type="text" name="song${counter}" id="song${counter}" class="inputBox">`;
+                    const button = "<button type='button' form = 'songs' onClick='addLine()' id='newLine-button'>New Song</button><br>";
+                    document.getElementById('newLine-button').remove();
                     document.getElementById('songs').insertAdjacentHTML('beforeend', line);
                     document.getElementById('songs').insertAdjacentHTML('beforeend', button);
+                    document.getElementById(`song${counter}`).focus();
                 }
                 if (counter == 6) {
                     alert("Song Limit Reached");
@@ -31,23 +32,29 @@
                 counter++;
             }
 
-            async function getSongs() {
+            async function main() {
                 var output = '';
                 var form = new FormData(document.querySelector("form"));
                 for (var song of form.values()) {
                     var obj = await APIController.searchTrack(access_token, song);
-                    obj = obj.tracks.items[0];
-                    songs[song] = obj;
-                    var album = obj.album.name;
-                    var cover = obj.album.images[2].url;
-                    var artist = obj.artists[0].name;
-                    var id = obj.id;
-                    ids += id+',';
-                    var features = await APIController.multiFeatures(access_token, ids);
-                    output += `<img src=${cover}><br>Artist: ${artist}<br> Album: ${album}<br>`;
+                    try {
+                        obj = obj.tracks.items[0];
+                        songs[obj.name] = obj;
+                        var album = obj.album.name;
+                        var cover = obj.album.images[2].url;
+                        var artist = obj.artists[0].name;
+                        var id = obj.id;
+                        ids += id+',';
+                        var features = await APIController.getFeatures(access_token, id);
+                        songs[obj.name]['audio_features'] = features;
+                        output += `<img src=${cover}><br>Artist: ${artist}<br> Album: ${album}<br>`;
+                    } catch (error) {
+                        alert("There was an Error in Recieving your songs. Please Refresh and Try Again");
+                    }
+                    
                 }
-                console.log(songs);                
-                console.log(features);
+                combineStats(songs);
+
                 displayText(output);
             }
 

@@ -63,3 +63,35 @@ while ( e = r.exec(q)) {
 }
 return hashParams;
 }
+
+function combineStats(songs) {
+    var numItems = Object.keys(songs).length;
+    features = {
+        acousticness: 0,
+        danceability: 0,
+        energy: 0,
+        instrumentalness: 0,
+        liveness: 0,
+        loudness: 0,
+        speechiness: 0,
+        valence: 0,
+        tempo: 0,
+        mode: 0
+    };
+    for (let name in songs) {
+        let song = songs[name].audio_features;
+        features.acousticness += song.acousticness;
+        features.danceability += song.danceability
+        features.energy += song.energy;
+        features.liveness += song.liveness;
+        features.loudness += song.loudness;
+        features.mode += song.mode;
+        features.speechiness += song.speechiness;
+        features.tempo += song.tempo;
+        features.valence += song.valence;
+    }
+    for (let item in features) {
+        features[item] /= numItems;
+    }    
+    console.log(features);
+}

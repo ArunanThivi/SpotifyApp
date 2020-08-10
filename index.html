@@ -36,13 +36,25 @@
 
         var params = getHashParams();        
         var access_token = params.access_token;
-        
+
         document.getElementById('songs-button').addEventListener('click', function() {
           var client_id = 'affcf25d1aaf4340b011b9bb809cb495';
           var redirect_uri = 'http://localhost:8080/Songs.html';
           var url = 'https://accounts.spotify.com/authorize?response_type=token';
           url += '&client_id=' + encodeURIComponent(client_id);
           url += '&redirect_uri=' + encodeURIComponent(redirect_uri);
+          window.location = url;
+        }, false);
+
+        document.getElementById('account-button').addEventListener('click', function() {
+          var client_id = 'affcf25d1aaf4340b011b9bb809cb495';
+          var redirect_uri = 'http://localhost:8080/Profile.html';
+          var scopes = 'user-top-read';
+
+          var url = 'https://accounts.spotify.com/authorize?response_type=token';          
+          url += '&client_id=' + encodeURIComponent(client_id);
+          url += '&redirect_uri=' + encodeURIComponent(redirect_uri);
+          url += '&scope=' + encodeURIComponent(scopes);
           window.location = url;
         }, false);
         
