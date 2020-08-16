@@ -71,14 +71,6 @@ const APIController = (function() {
 
 })();
 
-const APPControler = (function(APICtrl) {
-
-    const getTracks = async() => {
-        const token = await APICtrl.getToken();
-        
-    }
-})(APIController);
-
 
 function getHashParams() {
 var hashParams = {};
@@ -89,6 +81,8 @@ while ( e = r.exec(q)) {
 }
 return hashParams;
 }
+
+var attributes;
 
 function combineStats(songs) {
     var numItems = Object.keys(songs).length;
@@ -115,9 +109,66 @@ function combineStats(songs) {
         features.speechiness += song.speechiness;
         features.tempo += song.tempo;
         features.valence += song.valence;
+        features.instrumentalness += song.instrumentalness;
     }
     for (let item in features) {
         features[item] = parseFloat((features[item] / numItems).toFixed(5));
-    }    
+    }
+    attributes = features;
     console.log(features);
+    return features;
+}
+
+function heuristic(features) {
+    var set1 = {
+        "acousticness" : features.acousticness,
+        "danceability": features.danceability,
+        "energy": features.energy,
+        "instrumentalness": features.instrumentalness,
+        "liveness": features.liveness,
+        "speechiness": features.speechiness,
+        "valence": features.valence
+    }
+    max = Math.max(...Object.values(set1));    
+    var maxAttr =  Object.keys(set1).filter(attr =>   set1[attr] == max);
+    return {attr: maxAttr[0], val: features[maxAttr]};
+}
+
+function displaySongs(songs, count=50, start = 0) {
+    for (let i = start; i < count; i++) {
+        var album = songs[i].album.name;
+        var cover = songs[i].album.images[1].url;
+        var artist = songs[i].artists[0].name;
+        var track = songs[i].name;
+        var boxElement = `<div class='songInfo'><img src=${cover} class='songTile'><br>Track: ${track}<br>Artist: ${artist}<br>Album: ${album}<br></div>` 
+        document.getElementById('songList').insertAdjacentHTML('beforeend', boxElement);
+        
+    }
+}
+
+function undergroundPick(songs) {
+    var min = 100;
+    var  minIndex = -1;
+    for (let i in songs) {
+        if (songs[i].popularity < min) {
+            min = songs[i].popularity;
+            minIndex = i;
+        }
+    }
+    return songs[minIndex];
+}
+
+function sortSongs(songs, attribute) {
+    console.log(songs);
+    songs.sort(function(a, b) {
+        if  (a.audio_features[attribute] < b.audio_features[attribute]) {
+            return 1;
+        }
+        else if (a.audio_features[attribute] > b.audio_features[attribute]) {
+            return -1;
+        }
+        return 0;
+    });
+    console.log(songs);
+    return songs;
 }

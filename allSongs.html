@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" href="css/master.css">
+    </head>
+    <body>
+        <div id='songList'>
+
+        </div>
+        <script src='js/app.js'></script>
+        <script>
+            var songs = JSON.parse(localStorage["songs"]);
+            console.log(songs);
+            displaySongs(songs);
+        </script>
+    </body>
+
+</html>
