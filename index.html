@@ -33,11 +33,12 @@
             }
           return hashParams;
         }
-
+        localStorage.clear();
         var params = getHashParams();        
         var access_token = params.access_token;
 
         document.getElementById('songs-button').addEventListener('click', function() {
+          sessionStorage.clear();
           var client_id = 'affcf25d1aaf4340b011b9bb809cb495';
           var redirect_uri = 'https://arunanthivi.github.io/SpotifyApp/Songs';
           var url = 'https://accounts.spotify.com/authorize?response_type=token';
@@ -47,6 +48,7 @@
         }, false);
 
         document.getElementById('account-button').addEventListener('click', function() {
+          sessionStorage.clear();
           var client_id = 'affcf25d1aaf4340b011b9bb809cb495';
           var redirect_uri = 'https://arunanthivi.github.io/SpotifyApp/Results';
           var scopes = 'user-top-read';

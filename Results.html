@@ -19,12 +19,13 @@
     <script src="js/app.js"></script>
     <script>
         (async function() {
-            if (!localStorage["token"]) {
+            console.log(sessionStorage);
+            if (!sessionStorage["token"]) {
                 var access_token = getHashParams().access_token;
             } else {
-                var access_token =localStorage["token"];
+                var access_token =sessionStorage["token"];
             }
-            if (!localStorage["songs"]) {
+            if (!sessionStorage["songs"]) {
                 var songs = await APIController.topTracks(access_token);
                 songs = songs.items;
                 ids = '';
@@ -36,9 +37,9 @@
                 for (index in features['audio_features']) {
                     songs[index]['audio_features'] = features['audio_features'][index];
                 }
-                localStorage["songs"] = JSON.stringify(songs);
+                sessionStorage["songs"] = JSON.stringify(songs);
             } else {
-                var songs = JSON.parse(localStorage["songs"]);
+                var songs = JSON.parse(sessionStorage["songs"]);
             }
             
             var stats = combineStats(songs);
