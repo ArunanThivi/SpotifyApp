@@ -19,6 +19,9 @@
     <script src="js/app.js"></script>
     <script>
         (async function() {
+            if (window.location.search.indexOf('error') != -1) {
+                    window.location.href = "index.html";
+            }
             console.log(sessionStorage);
             if (!sessionStorage["token"]) {
                 var access_token = getHashParams().access_token;
@@ -43,6 +46,7 @@
             }
             
             var stats = combineStats(songs);
+            console.log(stats);
             var topStat = heuristic(stats);
             console.log(topStat);
             var testVar = 'valence';

@@ -8,8 +8,11 @@
 
         </div>
         <script src="js/app.js"></script>
-        <script>
+        <script>            
             (async function() {
+                if (window.location.search.indexOf('error') != -1) {
+                    window.location.href = "index.html";
+                }
                 if (!sessionStorage["token"]) {
                     var access_token = getHashParams().access_token;                    
                     sessionStorage["token"] = access_token;

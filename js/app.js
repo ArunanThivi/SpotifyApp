@@ -106,7 +106,6 @@ while ( e = r.exec(q)) {
 return hashParams;
 }
 
-var attributes;
 
 function combineStats(songs) {
     var numItems = Object.keys(songs).length;
@@ -136,9 +135,8 @@ function combineStats(songs) {
         features.instrumentalness += song.instrumentalness;
     }
     for (let item in features) {
-        features[item] = parseFloat((features[item] / numItems).toFixed(5));
+        features[item] = Math.abs(.5 - parseFloat((features[item] / numItems).toFixed(5)));
     }
-    attributes = features;
     console.log(features);
     return features;
 }
@@ -153,7 +151,7 @@ function heuristic(features) {
         "speechiness": features.speechiness,
         "valence": features.valence
     }
-    max = Math.max(...Object.values(set1));    
+    let max = Math.max(...Object.values(set1));    
     var maxAttr =  Object.keys(set1).filter(attr =>   set1[attr] == max);
     return {attr: maxAttr[0], val: features[maxAttr]};
 }
