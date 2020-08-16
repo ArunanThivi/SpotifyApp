@@ -133,13 +133,13 @@ function heuristic(features) {
     var maxAttr =  Object.keys(set1).filter(attr =>   set1[attr] == max);
     return {attr: maxAttr[0], val: features[maxAttr]};
 }
-
+//MAGIC NUMBER 34
 function displaySongs(songs, count=50, start = 0) {
     for (let i = start; i < count; i++) {
-        var album = songs[i].album.name;
+        var album = (songs[i].album.name.length < 35 ? songs[i].album.name : songs[i].album.name.substring(0, 35)+"...");;
         var cover = songs[i].album.images[1].url;
-        var artist = songs[i].artists[0].name;
-        var track = songs[i].name;
+        var artist = (songs[i].artists[0].name.length < 35 ? songs[i].artists[0].name : songs[i].artists[0].name.substring(0, 35)+"...");;
+        var track = (songs[i].name.length < 35 ? songs[i].name : songs[i].name.substring(0, 35)+"...");
         var boxElement = `<div class='songInfo'><img src=${cover} class='songTile'><br>Track: ${track}<br>Artist: ${artist}<br>Album: ${album}<br></div>` 
         document.getElementById('songList').insertAdjacentHTML('beforeend', boxElement);
         
