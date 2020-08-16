@@ -53,3 +53,18 @@ a {
 .songInfo {
   margin: 20px;
 }
+
+#playlistList {
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+}
+
+.songInfo {
+  padding: 10px;
+}
+
+.playlistTile {
+  height: 300px;
+  width: 300px;
+}

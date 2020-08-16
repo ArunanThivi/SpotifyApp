@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" href="css/master.css">
+    </head>
+    <body>
+        <div id='playlistList'>
+
+        </div>
+        <script src="js/app.js"></script>
+        <script>
+            (async function() {
+                if (!sessionStorage["token"]) {
+                    var access_token = getHashParams().access_token;                    
+                    sessionStorage["token"] = access_token;
+                } else {
+                    var access_token = sessionStorage["token"];
+                }
+                var playlists = await APIController.getPlaylists(access_token);
+                playlists = playlists.items;
+                console.log(playlists);
+                displayPlaylists(playlists);
+                console.log(sessionStorage);
+            })();
+        </script>
+    </body>
+</html>

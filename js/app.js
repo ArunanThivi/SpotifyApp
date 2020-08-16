@@ -10,6 +10,24 @@ const APIController = (function() {
         return data;
     }
 
+    const _getPlaylists = async(token) => {
+        const result = await fetch(`https://api.spotify.com/v1/me/playlists`, {
+            method: 'GET',
+            headers: { 'Authorization': 'Bearer ' + token },
+        });
+        const data = await result.json();
+        return data;
+    }
+
+    const _getPlaylistSongs = async(token, playlistId) => {
+        const result = await fetch(`https://api.spotify.com/v1/playlists/${playlistId}/tracks?fields=items(track)&limit=50`, {
+            method: 'GET',
+            headers: { 'Authorization': 'Bearer ' + token },
+        });
+        const data = await result.json();
+        return data;
+    }
+
     const _topTracks = async(token) => {
         const result = await fetch(`https://api.spotify.com/v1/me/top/tracks?limit=50`, {
             method: 'GET',
@@ -66,6 +84,12 @@ const APIController = (function() {
         },
         topTracks(token) {
             return _topTracks(token);
+        },
+        getPlaylists(token) {
+            return _getPlaylists(token);
+        },
+        getPlaylistSongs(token, playlistId) {
+            return _getPlaylistSongs(token, playlistId);
         }
     }
 
@@ -180,4 +204,43 @@ function sortSongs(songs, attribute) {
     });
     console.log(songs);
     return songs;
+}
+
+function displayPlaylists(playlists, count=20, start = 0) {
+    console.log(playlists);
+    for (let i = start; i < count; i++) {
+        var id = playlists[i].id;
+        var cover = (playlists[i].images.length > 1 ? playlists[i].images[1].url : playlists[i].images[0].url);
+        var name = playlists[i].name;
+        var owner = playlists[i].owner.display_name;
+        var boxElement = `<div class='songInfo' id='playlist${i}'><img src=${cover} class='playlistTile' onClick='getPlaylist("${id}")'><br>Name: ${name}<br>Owner: ${owner}<br></div>` 
+        document.getElementById('playlistList').insertAdjacentHTML('beforeend', boxElement);
+    }
+
+}
+async function getPlaylist(id) {
+    if (!sessionStorage["token"]) {
+        var access_token = getHashParams().access_token;
+        sessionStorage["token"] = access_token;                 
+    } else {
+        var access_token = sessionStorage["token"];
+    }
+    console.log(id);
+    playlistSongs = await APIController.getPlaylistSongs(access_token, id);
+    playlistSongs = playlistSongs.items;
+    var ids = '';
+    for (index in playlistSongs) {
+        playlistSongs[index] = playlistSongs[index].track;
+        console.log(playlistSongs[index]);
+        ids += playlistSongs[index].id+",";
+    }
+    var features = await APIController.multiFeatures(access_token, ids);
+    features = features['audio_features'];
+    console.log(features);
+    for (index in playlistSongs) {
+        playlistSongs[index]['audio_features'] = features[index];
+    }
+    console.log(playlistSongs);
+    sessionStorage["songs"] = JSON.stringify(playlistSongs);
+    window.location.href="Results.html"
 }

@@ -17,6 +17,10 @@
         <img src="misc/Spotify_Icon_RGB_Green.png" class='lg-icon' id='account-button'><br>
         <h2>Import Spotify</h2>
       </div>
+      <div id="playlist">
+        <img src="misc/Music Note Clip Art 3455.jpg" class='lg-icon' id="playlist-button"><br>
+        <h2>Import Playlist</h2>
+    </div>
     </div>
     <script>
       (function() {
@@ -33,7 +37,7 @@
             }
           return hashParams;
         }
-        localStorage.clear();
+        sessionStorage.clear();
         var params = getHashParams();        
         var access_token = params.access_token;
 
@@ -52,6 +56,19 @@
           var client_id = 'affcf25d1aaf4340b011b9bb809cb495';
           var redirect_uri = 'https://arunanthivi.github.io/SpotifyApp/Results';
           var scopes = 'user-top-read';
+
+          var url = 'https://accounts.spotify.com/authorize?response_type=token';          
+          url += '&client_id=' + encodeURIComponent(client_id);
+          url += '&redirect_uri=' + encodeURIComponent(redirect_uri);
+          url += '&scope=' + encodeURIComponent(scopes);
+          window.location = url;
+        }, false);
+
+        document.getElementById('playlist-button').addEventListener('click', function() {
+          sessionStorage.clear();
+          var client_id = 'affcf25d1aaf4340b011b9bb809cb495';
+          var redirect_uri = 'https://arunanthivi.github.io/SpotifyApp/Playlists';
+          var scopes = 'playlist-read-private';
 
           var url = 'https://accounts.spotify.com/authorize?response_type=token';          
           url += '&client_id=' + encodeURIComponent(client_id);
