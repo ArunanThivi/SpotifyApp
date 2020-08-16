@@ -39,7 +39,7 @@
 
         document.getElementById('songs-button').addEventListener('click', function() {
           var client_id = 'affcf25d1aaf4340b011b9bb809cb495';
-          var redirect_uri = 'http://localhost:8080/Songs.html';
+          var redirect_uri = 'https://arunanthivi.github.io/SpotifyApp/Songs.html';
           var url = 'https://accounts.spotify.com/authorize?response_type=token';
           url += '&client_id=' + encodeURIComponent(client_id);
           url += '&redirect_uri=' + encodeURIComponent(redirect_uri);
@@ -48,7 +48,7 @@
 
         document.getElementById('account-button').addEventListener('click', function() {
           var client_id = 'affcf25d1aaf4340b011b9bb809cb495';
-          var redirect_uri = 'http://localhost:8080/Results.html';
+          var redirect_uri = 'https://arunanthivi.github.io/SpotifyApp/Results.html';
           var scopes = 'user-top-read';
 
           var url = 'https://accounts.spotify.com/authorize?response_type=token';          
