@@ -53,15 +53,10 @@
                     }
                     
                 }
-                combineStats(songs);
-
-                displayText(output);
+                localStorage["token"] = access_token;
+                localStorage["songs"] = JSON.stringify(songs);
+                window.location.href="Results.html"
             }
-
-            function displayText(output) {
-                document.write(output);
-            }
-
         </script>
     </body>
 </html>

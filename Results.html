@@ -19,7 +19,12 @@
     <script src="js/app.js"></script>
     <script>
         (async function() {
+            if (!localStorage["token"]) {
                 var access_token = getHashParams().access_token;
+            } else {
+                var access_token =localStorage["token"];
+            }
+            if (!localStorage["songs"]) {
                 var songs = await APIController.topTracks(access_token);
                 songs = songs.items;
                 ids = '';
@@ -32,62 +37,65 @@
                     songs[index]['audio_features'] = features['audio_features'][index];
                 }
                 localStorage["songs"] = JSON.stringify(songs);
-                var stats = combineStats(songs);
-                var topStat = heuristic(stats);
-                console.log(topStat);
-                var testVar = 'valence';
-                switch(topStat.attr) {
-                    case 'danceability':
-                        document.body.style.backgroundColor = "#883df2";
-                        document.body.style.color = "white";
-                        document.getElementById('mainFeature').insertAdjacentHTML("afterbegin", "<h2>Our Analysis Determined that you like to</h2>");
-                        document.getElementById('mainFeature').insertAdjacentHTML("beforeend", "<h1>Dance!</h1>");
-                        break;
-                    case 'acousticness':
-                        document.body.style.backgroundColor = "#eb8d3b";
+            } else {
+                var songs = JSON.parse(localStorage["songs"]);
+            }
+            
+            var stats = combineStats(songs);
+            var topStat = heuristic(stats);
+            console.log(topStat);
+            var testVar = 'valence';
+            switch(topStat.attr) {
+                case 'danceability':
+                    document.body.style.backgroundColor = "#883df2";
+                    document.body.style.color = "white";
+                    document.getElementById('mainFeature').insertAdjacentHTML("afterbegin", "<h2>Our Analysis Determined that you like to</h2>");
+                    document.getElementById('mainFeature').insertAdjacentHTML("beforeend", "<h1>Dance!</h1>");
+                    break;
+                case 'acousticness':
+                    document.body.style.backgroundColor = "#eb8d3b";
+                    document.body.style.color = "black";
+                    document.getElementById('mainFeature').insertAdjacentHTML("afterbegin", "<h2>Our Analysis Determined that you like your music</h2>");
+                    document.getElementById('mainFeature').insertAdjacentHTML("beforeend", "<h1>Acoustic!</h1>");
+                    break;
+                case 'energy':
+                    document.body.style.backgroundColor = "#5ac73c";
                         document.body.style.color = "black";
-                        document.getElementById('mainFeature').insertAdjacentHTML("afterbegin", "<h2>Our Analysis Determined that you like your music</h2>");
-                        document.getElementById('mainFeature').insertAdjacentHTML("beforeend", "<h1>Acoustic!</h1>");
-                        break;
-                    case 'energy':
-                        document.body.style.backgroundColor = "#5ac73c";
-                            document.body.style.color = "black";
-                        document.getElementById('mainFeature').insertAdjacentHTML("afterbegin", "<h2>Our Analysis Determined that you like your music</h2>");
-                        document.getElementById('mainFeature').insertAdjacentHTML("beforeend", "<h1>Intense!</h1>");
-                        break;
-                    case 'instrumentalness':
-                        document.body.style.backgroundColor = "#ced10a";
-                        document.body.style.color = "black";
-                        document.getElementById('mainFeature').insertAdjacentHTML("afterbegin", "<h2>Our Analysis Determined that you like the sound of</h2>");
-                        document.getElementById('mainFeature').insertAdjacentHTML("beforeend", "<h1>Beats!</h1>");
-                        break;
-                    case 'liveness':
-                        document.body.style.backgroundColor = "#ff5454";
-                        document.body.style.color = "black";
-                        document.getElementById('mainFeature').insertAdjacentHTML("afterbegin", "<h2>Our Analysis Determined that you like your music</h2>");
-                        document.getElementById('mainFeature').insertAdjacentHTML("beforeend", "<h1>LIVE!</h1>");
-                        break;
-                    case 'speechiness':
-                        document.body.style.backgroundColor = "#548dff";
-                        document.body.style.color = "black";
-                        document.getElementById('mainFeature').insertAdjacentHTML("afterbegin", "<h2>Our Analysis Determined that you like the sound of</h2>");
-                        document.getElementById('mainFeature').insertAdjacentHTML("beforeend", "<h1>Vocals!</h1>");
-                        break;
-                    case 'valence':
-                        document.body.style.backgroundColor = "#ff61ed";
-                        document.body.style.color = "black";
-                        document.getElementById('mainFeature').insertAdjacentHTML("afterbegin", "<h2>Our Analysis Determined that you like to be</h2>");
-                        document.getElementById('mainFeature').insertAdjacentHTML("beforeend", "<h1>Positive!</h1>");
-                        break;
-                }
-                var sorted = sortSongs(songs, topStat.attr);
-                console.log(sorted);
-                document.getElementById('mainFeature').insertAdjacentHTML("beforeend", `<p id='subtitle'>With a confidence score of ${(topStat.val*100).toFixed(2)} / 100</p>`)
-                //document.getElementById('totalSongs').addEventListener('click', allSongs());
-                
-                displaySongs(songs, 5);
-                var lstPopular = undergroundPick(songs);
-                document.getElementById('underground').insertAdjacentHTML('afterbegin', `<h2>Your Underground Track is<img src=${lstPopular.album.images[1].url} id='undergroundPic'><u>${lstPopular.name}</u> by <u>${lstPopular.artists[0].name}</u>!</h2>`)
-            })();
+                    document.getElementById('mainFeature').insertAdjacentHTML("afterbegin", "<h2>Our Analysis Determined that you like your music</h2>");
+                    document.getElementById('mainFeature').insertAdjacentHTML("beforeend", "<h1>Intense!</h1>");
+                    break;
+                case 'instrumentalness':
+                    document.body.style.backgroundColor = "#ced10a";
+                    document.body.style.color = "black";
+                    document.getElementById('mainFeature').insertAdjacentHTML("afterbegin", "<h2>Our Analysis Determined that you like the sound of</h2>");
+                    document.getElementById('mainFeature').insertAdjacentHTML("beforeend", "<h1>Beats!</h1>");
+                    break;
+                case 'liveness':
+                    document.body.style.backgroundColor = "#ff5454";
+                    document.body.style.color = "black";
+                    document.getElementById('mainFeature').insertAdjacentHTML("afterbegin", "<h2>Our Analysis Determined that you like your music</h2>");
+                    document.getElementById('mainFeature').insertAdjacentHTML("beforeend", "<h1>LIVE!</h1>");
+                    break;
+                case 'speechiness':
+                    document.body.style.backgroundColor = "#548dff";
+                    document.body.style.color = "black";
+                    document.getElementById('mainFeature').insertAdjacentHTML("afterbegin", "<h2>Our Analysis Determined that you like the sound of</h2>");
+                    document.getElementById('mainFeature').insertAdjacentHTML("beforeend", "<h1>Vocals!</h1>");
+                    break;
+                case 'valence':
+                    document.body.style.backgroundColor = "#ff61ed";
+                    document.body.style.color = "black";
+                    document.getElementById('mainFeature').insertAdjacentHTML("afterbegin", "<h2>Our Analysis Determined that you like to be</h2>");
+                    document.getElementById('mainFeature').insertAdjacentHTML("beforeend", "<h1>Positive!</h1>");
+                    break;
+            }
+            var sorted = sortSongs(songs, topStat.attr);
+            console.log(sorted);
+            document.getElementById('mainFeature').insertAdjacentHTML("beforeend", `<p id='subtitle'>With a confidence score of ${(topStat.val*100).toFixed(2)} / 100</p>`)
+            //document.getElementById('totalSongs').addEventListener('click', allSongs());
+            displaySongs(sorted, Math.min(Object.keys(songs).length, 5));
+            var lstPopular = undergroundPick(songs);
+            document.getElementById('underground').insertAdjacentHTML('afterbegin', `<h2>Your Underground Track is<img src=${lstPopular.album.images[1].url} id='undergroundPic'><u>${lstPopular.name}</u> by <u>${lstPopular.artists[0].name}</u>!</h2>`)
+        })();
     </script>
 </html>

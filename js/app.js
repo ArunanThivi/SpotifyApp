@@ -133,8 +133,9 @@ function heuristic(features) {
     var maxAttr =  Object.keys(set1).filter(attr =>   set1[attr] == max);
     return {attr: maxAttr[0], val: features[maxAttr]};
 }
-//MAGIC NUMBER 34
+
 function displaySongs(songs, count=50, start = 0) {
+    console.log(songs);
     for (let i = start; i < count; i++) {
         var album = (songs[i].album.name.length < 35 ? songs[i].album.name : songs[i].album.name.substring(0, 35)+"...");;
         var cover = songs[i].album.images[1].url;
@@ -160,6 +161,14 @@ function undergroundPick(songs) {
 
 function sortSongs(songs, attribute) {
     console.log(songs);
+    if (!Array.isArray(songs)) {
+        let list = [];
+        for (song in songs) {
+            console.log(song);
+            list.push(songs[song]);
+        }
+        songs = list;
+    }
     songs.sort(function(a, b) {
         if  (a.audio_features[attribute] < b.audio_features[attribute]) {
             return 1;
