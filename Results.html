@@ -22,7 +22,6 @@
             if (window.location.search.indexOf('error') != -1) {
                     window.location.href = "index.html";
             }
-            console.log(sessionStorage);
             if (!sessionStorage["token"]) {
                 var access_token = getHashParams().access_token;
             } else {
@@ -45,10 +44,7 @@
                 var songs = JSON.parse(sessionStorage["songs"]);
             }
             
-            var stats = combineStats(songs);
-            console.log(stats);
-            var topStat = heuristic(stats);
-            console.log(topStat);
+            var topStat = heuristic(songs);
             var testVar = 'valence';
             switch(topStat.attr) {
                 case 'danceability':
@@ -67,7 +63,7 @@
                     document.body.style.backgroundColor = "#5ac73c";
                         document.body.style.color = "black";
                     document.getElementById('mainFeature').insertAdjacentHTML("afterbegin", "<h2>Our Analysis Determined that you like your music</h2>");
-                    document.getElementById('mainFeature').insertAdjacentHTML("beforeend", "<h1>Intense!</h1>");
+                    document.getElementById('mainFeature').insertAdjacentHTML("beforeend", "<h1>Fast!</h1>");
                     break;
                 case 'instrumentalness':
                     document.body.style.backgroundColor = "#ced10a";
@@ -95,7 +91,6 @@
                     break;
             }
             var sorted = sortSongs(songs, topStat.attr);
-            console.log(sorted);
             document.getElementById('mainFeature').insertAdjacentHTML("beforeend", `<p id='subtitle'>With a confidence score of ${(topStat.val*100).toFixed(2)} / 100</p>`)
             //document.getElementById('totalSongs').addEventListener('click', allSongs());
             displaySongs(sorted, Math.min(Object.keys(songs).length, 5));

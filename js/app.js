@@ -107,57 +107,48 @@ return hashParams;
 }
 
 
-function combineStats(songs) {
+function heuristic(songs) {
     var numItems = Object.keys(songs).length;
-    features = {
+    //Calcuate the Average score for every feature across all songs
+    avgFeatures = {
         acousticness: 0,
         danceability: 0,
         energy: 0,
         instrumentalness: 0,
         liveness: 0,
-        loudness: 0,
         speechiness: 0,
         valence: 0,
-        tempo: 0,
-        mode: 0
     };
     for (let name in songs) {
         let song = songs[name].audio_features;
-        features.acousticness += song.acousticness;
-        features.danceability += song.danceability
-        features.energy += song.energy;
-        features.liveness += song.liveness;
-        features.loudness += song.loudness;
-        features.mode += song.mode;
-        features.speechiness += song.speechiness;
-        features.tempo += song.tempo;
-        features.valence += song.valence;
-        features.instrumentalness += song.instrumentalness;
+        avgFeatures.acousticness += (song.acousticness > .2 ? 1 : 0);
+        avgFeatures.danceability += song.danceability;
+        avgFeatures.energy += song.energy;
+        avgFeatures.liveness += (song.liveness > .8 ? 1 : 0);
+        avgFeatures.speechiness += (song.speechiness > .33 ? song.speechiness > .66 ? 1 : .5 : 0);
+        avgFeatures.valence += song.valence;
+        avgFeatures.instrumentalness += (song.instrumentalness > .5 ? 1 : 0);
     }
-    for (let item in features) {
-        features[item] = Math.abs(.5 - parseFloat((features[item] / numItems).toFixed(5)));
-    }
-    console.log(features);
-    return features;
-}
+    
 
-function heuristic(features) {
-    var set1 = {
-        "acousticness" : features.acousticness,
-        "danceability": features.danceability,
-        "energy": features.energy,
-        "instrumentalness": features.instrumentalness,
-        "liveness": features.liveness,
-        "speechiness": features.speechiness,
-        "valence": features.valence
+    for (let item in avgFeatures) {
+        avgFeatures[item] = parseFloat((avgFeatures[item] / numItems).toFixed(5));//Change this line
     }
-    let max = Math.max(...Object.values(set1));    
-    var maxAttr =  Object.keys(set1).filter(attr =>   set1[attr] == max);
-    return {attr: maxAttr[0], val: features[maxAttr]};
+
+    //Adjust the skews in the data set to get a normal standard distribution.
+    avgFeatures.danceability -= .125;
+    avgFeatures.energy -= .225;
+    avgFeatures.valence += .05;
+
+    console.log(avgFeatures);
+    //Find the attribute (within set1) that is most representative across all songs
+
+    let max = Math.max(...Object.values(avgFeatures));    
+    var maxAttr =  Object.keys(avgFeatures).filter(attr =>   avgFeatures[attr] == max);
+    return {attr: maxAttr[0], val: avgFeatures[maxAttr]};
 }
 
 function displaySongs(songs, count=50, start = 0) {
-    console.log(songs);
     for (let i = start; i < count; i++) {
         var album = (songs[i].album.name.length < 35 ? songs[i].album.name : songs[i].album.name.substring(0, 35)+"...");;
         var cover = songs[i].album.images[1].url;
@@ -182,14 +173,8 @@ function undergroundPick(songs) {
 }
 
 function sortSongs(songs, attribute) {
-    console.log(songs);
     if (!Array.isArray(songs)) {
-        let list = [];
-        for (song in songs) {
-            console.log(song);
-            list.push(songs[song]);
-        }
-        songs = list;
+        songs = Object.values(songs);
     }
     songs.sort(function(a, b) {
         if  (a.audio_features[attribute] < b.audio_features[attribute]) {
@@ -200,7 +185,6 @@ function sortSongs(songs, attribute) {
         }
         return 0;
     });
-    console.log(songs);
     return songs;
 }
 
@@ -229,7 +213,6 @@ async function getPlaylist(id) {
     var ids = '';
     for (index in playlistSongs) {
         playlistSongs[index] = playlistSongs[index].track;
-        console.log(playlistSongs[index]);
         ids += playlistSongs[index].id+",";
     }
     var features = await APIController.multiFeatures(access_token, ids);
