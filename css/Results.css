@@ -19,7 +19,7 @@ p {
 }
 
 #totalSongs {
-    padding-top: 75px;
+    margin-top: 75px;
     display: block;
     text-align: center;
     font-size: 40px;

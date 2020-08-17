@@ -21,9 +21,7 @@
                 }
                 var playlists = await APIController.getPlaylists(access_token);
                 playlists = playlists.items;
-                console.log(playlists);
                 displayPlaylists(playlists);
-                console.log(sessionStorage);
             })();
         </script>
     </body>

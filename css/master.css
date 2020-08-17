@@ -42,8 +42,8 @@ a {
   
 }
 #songForm {
-  margin-top: 30%;
-  margin-left: 40%;
+  margin-top: 40vh;
+  margin-left: 40vw;
 }
 
 .inputBox {
@@ -67,4 +67,8 @@ a {
 .playlistTile {
   height: 300px;
   width: 300px;
+}
+
+.link {
+  cursor: pointer;
 }

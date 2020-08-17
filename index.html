@@ -10,16 +10,16 @@
   <body>
     <div id="flexbox">
       <div id="music">
-          <img src="misc/Music Note Clip Art 3455.jpg" class='lg-icon' id="songs-button"><br>
-          <h2>Select Music</h2>
+          <img src="misc/Music Note Clip Art 3455.jpg" class='lg-icon link' id="songs-button"><br>
+          <h2 class= "link">Select Music</h2>
       </div>
       <div id='spotify'>
-        <img src="misc/Spotify_Icon_RGB_Green.png" class='lg-icon' id='account-button'><br>
-        <h2>Import Spotify</h2>
+        <img src="misc/Spotify_Icon_RGB_Green.png" class='lg-icon link' id='account-button'><br>
+        <h2 class="link">Import Spotify</h2>
       </div>
       <div id="playlist">
         <img src="misc/Music Note Clip Art 3455.jpg" class='lg-icon' id="playlist-button"><br>
-        <h2>Import Playlist</h2>
+        <h2 class="link">Import Playlist</h2>
     </div>
     </div>
     <script>
@@ -41,7 +41,7 @@
         var params = getHashParams();        
         var access_token = params.access_token;
 
-        document.getElementById('songs-button').addEventListener('click', function() {
+        document.getElementById('music').addEventListener('click', function() {
           sessionStorage.clear();
           var client_id = 'affcf25d1aaf4340b011b9bb809cb495';
           var redirect_uri = 'https://arunanthivi.github.io/SpotifyApp/Songs';
@@ -51,7 +51,7 @@
           window.location = url;
         }, false);
 
-        document.getElementById('account-button').addEventListener('click', function() {
+        document.getElementById('spotify').addEventListener('click', function() {
           sessionStorage.clear();
           var client_id = 'affcf25d1aaf4340b011b9bb809cb495';
           var redirect_uri = 'https://arunanthivi.github.io/SpotifyApp/Results';
@@ -64,7 +64,7 @@
           window.location = url;
         }, false);
 
-        document.getElementById('playlist-button').addEventListener('click', function() {
+        document.getElementById('playlist').addEventListener('click', function() {
           sessionStorage.clear();
           var client_id = 'affcf25d1aaf4340b011b9bb809cb495';
           var redirect_uri = 'https://arunanthivi.github.io/SpotifyApp/Playlists';

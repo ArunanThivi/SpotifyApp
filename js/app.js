@@ -140,7 +140,6 @@ function heuristic(songs) {
     avgFeatures.energy -= .225;
     avgFeatures.valence += .05;
 
-    console.log(avgFeatures);
     //Find the attribute (within set1) that is most representative across all songs
 
     let max = Math.max(...Object.values(avgFeatures));    
@@ -189,7 +188,6 @@ function sortSongs(songs, attribute) {
 }
 
 function displayPlaylists(playlists, count=20, start = 0) {
-    console.log(playlists);
     for (let i = start; i < count; i++) {
         var id = playlists[i].id;
         var cover = (playlists[i].images.length > 1 ? playlists[i].images[1].url : playlists[i].images[0].url);
@@ -207,7 +205,6 @@ async function getPlaylist(id) {
     } else {
         var access_token = sessionStorage["token"];
     }
-    console.log(id);
     playlistSongs = await APIController.getPlaylistSongs(access_token, id);
     playlistSongs = playlistSongs.items;
     var ids = '';
@@ -217,11 +214,9 @@ async function getPlaylist(id) {
     }
     var features = await APIController.multiFeatures(access_token, ids);
     features = features['audio_features'];
-    console.log(features);
     for (index in playlistSongs) {
         playlistSongs[index]['audio_features'] = features[index];
     }
-    console.log(playlistSongs);
     sessionStorage["songs"] = JSON.stringify(playlistSongs);
     window.location.href="Results.html"
 }
