@@ -44,7 +44,7 @@
         document.getElementById('music').addEventListener('click', function() {
           sessionStorage.clear();
           var client_id = 'affcf25d1aaf4340b011b9bb809cb495';
-          var redirect_uri = 'http://localhost:8080/Songs';
+          var redirect_uri = 'https://arunanthivi.github.io/SpotifyApp/Songs';
           var url = 'https://accounts.spotify.com/authorize?response_type=token';
           url += '&client_id=' + encodeURIComponent(client_id);
           url += '&redirect_uri=' + encodeURIComponent(redirect_uri);
@@ -54,7 +54,7 @@
         document.getElementById('spotify').addEventListener('click', function() {
           sessionStorage.clear();
           var client_id = 'affcf25d1aaf4340b011b9bb809cb495';
-          var redirect_uri = 'http://localhost:8080/Results';
+          var redirect_uri = 'https://arunanthivi.github.io/SpotifyApp/Results';
           var scopes = 'user-top-read';
 
           var url = 'https://accounts.spotify.com/authorize?response_type=token';          
@@ -67,7 +67,7 @@
         document.getElementById('playlist').addEventListener('click', function() {
           sessionStorage.clear();
           var client_id = 'affcf25d1aaf4340b011b9bb809cb495';
-          var redirect_uri = 'http://localhost:8080/Playlists';
+          var redirect_uri = 'https://arunanthivi.github.io/SpotifyApp/Playlists';
           var scopes = 'playlist-read-private';
 
           var url = 'https://accounts.spotify.com/authorize?response_type=token';          

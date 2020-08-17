@@ -133,7 +133,6 @@ function heuristic(songs) {
     for (let item in avgFeatures) {
         avgFeatures[item] = parseFloat((avgFeatures[item] / numItems).toFixed(5));//Change this line
     }
-    console.log(avgFeatures);
     //Adjust the skews in the data set to get a normal standard distribution.
     avgFeatures.danceability -= .125;
     avgFeatures.energy -= .225;
