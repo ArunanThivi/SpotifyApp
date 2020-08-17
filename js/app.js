@@ -193,7 +193,7 @@ function displayPlaylists(playlists, count=20, start = 0) {
         var cover = (playlists[i].images.length > 1 ? playlists[i].images[1].url : playlists[i].images[0].url);
         var name = playlists[i].name;
         var owner = playlists[i].owner.display_name;
-        var boxElement = `<div class='songInfo' id='playlist${i}'><img src=${cover} class='playlistTile' onClick='getPlaylist("${id}")'><br>Name: ${name}<br>Owner: ${owner}<br></div>` 
+        var boxElement = `<div class='songInfo' id='playlist${i}'><img src=${cover} class='playlistTile link' onClick='getPlaylist("${id}")'><br>Name: ${name}<br>Owner: ${owner}<br></div>` 
         document.getElementById('playlistList').insertAdjacentHTML('beforeend', boxElement);
     }
 
