@@ -121,7 +121,7 @@ function heuristic(songs) {
     };
     for (let name in songs) {
         let song = songs[name].audio_features;
-        avgFeatures.acousticness += (song.acousticness > .2 ? 1 : 0);
+        avgFeatures.acousticness += (song.acousticness > .2 ? .9 : 0);
         avgFeatures.danceability += song.danceability;
         avgFeatures.energy += song.energy;
         avgFeatures.liveness += (song.liveness > .8 ? 1 : 0);
@@ -130,11 +130,10 @@ function heuristic(songs) {
         avgFeatures.instrumentalness += (song.instrumentalness > .5 ? 1 : 0);
     }
     
-
     for (let item in avgFeatures) {
         avgFeatures[item] = parseFloat((avgFeatures[item] / numItems).toFixed(5));//Change this line
     }
-
+    console.log(avgFeatures);
     //Adjust the skews in the data set to get a normal standard distribution.
     avgFeatures.danceability -= .125;
     avgFeatures.energy -= .225;
@@ -144,7 +143,7 @@ function heuristic(songs) {
 
     let max = Math.max(...Object.values(avgFeatures));    
     var maxAttr =  Object.keys(avgFeatures).filter(attr =>   avgFeatures[attr] == max);
-    return {attr: maxAttr[0], val: avgFeatures[maxAttr]};
+    return {attr: maxAttr[0], val: max};
 }
 
 function displaySongs(songs, count=50, start = 0) {
