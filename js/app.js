@@ -149,13 +149,9 @@ function displaySongs(songs, count = 50, start = 0) {
     for (let i = start; i < count; i++) {
         var cover = songs[i].album.images[1].url;
         var song = songs[i].preview_url
-        var artist = (songs[i].artists[0].name.length < 35 ? songs[i].artists[0].name : songs[i].artists[0].name.substring(0, 35) + "...");
-        var track = (songs[i].name.indexOf('(') == -1 ?  songs[i].name.substring(0, 35) : songs[i].name.substring(0, songs[i].name.indexOf('(')));
         var boxElement = 
         `<div class='songInfo' onClick='createModal(${i})'>
         <img src=${cover} class='songTile' onmouseover="PlaySound('sound${i}')" onmouseout="StopSound('sound${i}')"><br>
-        Track: ${track}<br>
-        Artist: ${artist}<br>
         <audio id = 'sound${i}' src='${song}'>
         </div>`
         document.getElementById('songList').insertAdjacentHTML('beforeend', boxElement);
@@ -234,4 +230,90 @@ async function getPlaylist(id) {
     }
     sessionStorage["songs"] = JSON.stringify(playlistSongs);
     window.location.href = "Results.html"
+}
+
+var createModal = function (i) {
+    console.log("TEST")
+    document.getElementById('modal-text').innerHTML = `            
+    <img src='${songs[i].album.images[1].url}' style="float: right"  onmouseover="PlaySound('sound${i}')" onmouseout="StopSound('sound${i}')"><br><br>
+    Title: ${songs[i].name}<br><br>
+    Artist: ${songs[i].artists[0].name}<br><br>
+    Album: ${songs[i].album.name}<br><br> 
+    Popularity: ${songs[i].popularity}<br><br>
+    Acousticness: ${Math.round(songs[i].audio_features.acousticness * 100)}/100<br><br>
+    Danceability: ${Math.round(songs[i].audio_features.danceability * 100)}/100<br><br>
+    Energy: ${Math.round(songs[i].audio_features.energy * 100)}/100<br><br>
+    Valence: ${Math.round(songs[i].audio_features.valence * 100)}/100<br><br>
+    Tempo: ${Math.round(songs[i].audio_features.tempo)} BPM<br><br>
+    Instrumentalness: ${Math.round(songs[i].audio_features.instrumentalness * 100)}/100<br><br>
+    Liveness: ${Math.round(songs[i].audio_features.liveness * 100)}/100<br><br>`;
+    console.log(songs[i].album.images[1].url);
+    modal.style.display = "block";
+}
+
+function displaySorted(songs, attr) {
+    clearSongs();
+    var buttons = document.getElementsByClassName("btn")
+    for (let button of buttons) {
+        if (button.id == `btn-${attr}`) {
+            button.style.backgroundColor = "#008CBA";
+            button.style.color = "white";
+        } else {
+            button.style.color = "black";
+            button.style.backgroundColor = "white";
+        }
+    }
+    displaySongs(sortSongs(songs, attr), songs.length);
+}
+
+function originalSort(songs) {
+    clearSongs();
+    var buttons = document.getElementsByClassName("btn")
+    for (let button of buttons) {
+        if (button.id == `btn-original`) {
+            button.style.backgroundColor = "#008CBA";
+            button.style.color = "white";
+        } else {
+            button.style.color = "black";
+            button.style.backgroundColor = "white";
+        }
+    }
+    songs.sort(function (a, b) {
+        if (a.original < b.original) {
+            return -1;
+        }
+        else if (a.original > b.original) {
+            return 1;
+        }
+        return 0;
+    });
+    displaySongs(songs, songs.length);
+}
+
+function sortedPopularity(songs) {
+    clearSongs();
+    var buttons = document.getElementsByClassName("btn")
+    for (let button of buttons) {
+        if (button.id == `btn-popular`) {
+            button.style.backgroundColor = "#008CBA";
+            button.style.color = "white";
+        } else {
+            button.style.color = "black";
+            button.style.backgroundColor = "white";
+        }
+    }
+    songs.sort(function (a, b) {
+        if (a.popularity < b.popularity) {
+            return 1;
+        }
+        else if (a.popularity > b.popularity) {
+            return -1;
+        }
+        return 0;
+    });
+    displaySongs(songs, songs.length);
+}
+
+function clearSongs() {
+    document.getElementById("songList").innerHTML = "";
 }

@@ -32,6 +32,7 @@
                 songs = songs.items;
                 ids = '';
                 for (index in songs) {
+                    songs[index]['original'] = parseInt(index, 10);
                     ids += songs[index].id+','
                 }
                 var features = await APIController.multiFeatures(access_token, ids);
