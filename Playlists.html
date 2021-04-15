@@ -13,11 +13,11 @@
                 if (window.location.search.indexOf('error') != -1) {
                     window.location.href = "index.html";
                 }
-                if (!sessionStorage["token"]) {
+                if (!localStorage["token"]) {
                     var access_token = getHashParams().access_token;                    
-                    sessionStorage["token"] = access_token;
+                    localStorage["token"] = access_token;
                 } else {
-                    var access_token = sessionStorage["token"];
+                    var access_token = localStorage["token"];
                 }
                 var playlists = await APIController.getPlaylists(access_token);
                 playlists = playlists.items;

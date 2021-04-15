@@ -1,6 +1,6 @@
-const APIController = (function() {
+const APIController = (function () {
 
-    const _getProfile = async(token) => {
+    const _getProfile = async (token) => {
         const result = await fetch(`https://api.spotify.com/v1/me`, {
             method: 'GET',
             headers: { 'Authorization': 'Bearer ' + token },
@@ -10,7 +10,7 @@ const APIController = (function() {
         return data;
     }
 
-    const _getPlaylists = async(token) => {
+    const _getPlaylists = async (token) => {
         const result = await fetch(`https://api.spotify.com/v1/me/playlists`, {
             method: 'GET',
             headers: { 'Authorization': 'Bearer ' + token },
@@ -19,7 +19,7 @@ const APIController = (function() {
         return data;
     }
 
-    const _getPlaylistSongs = async(token, playlistId) => {
+    const _getPlaylistSongs = async (token, playlistId) => {
         const result = await fetch(`https://api.spotify.com/v1/playlists/${playlistId}/tracks?fields=items(track)&limit=50`, {
             method: 'GET',
             headers: { 'Authorization': 'Bearer ' + token },
@@ -28,7 +28,7 @@ const APIController = (function() {
         return data;
     }
 
-    const _topTracks = async(token) => {
+    const _topTracks = async (token) => {
         const result = await fetch(`https://api.spotify.com/v1/me/top/tracks?limit=50`, {
             method: 'GET',
             headers: { 'Authorization': 'Bearer ' + token },
@@ -37,8 +37,8 @@ const APIController = (function() {
         const data = await result.json();
         return data;
     }
- 
-    const _searchTrack = async(token, name) => {
+
+    const _searchTrack = async (token, name) => {
         var trackName = name.replace(' /g', '%20');
         const result = await fetch(`https://api.spotify.com/v1/search?q=${trackName}&type=track&limit=1`, {
             method: 'GET',
@@ -48,8 +48,8 @@ const APIController = (function() {
         const data = await result.json();
         return data;
     }
-    
-    const _multifeatures = async(token, ids) => {
+
+    const _multifeatures = async (token, ids) => {
         const result = await fetch(`https://api.spotify.com/v1/audio-features/?ids=${ids}`, {
             method: 'GET',
             headers: { 'Authorization': 'Bearer ' + token },
@@ -59,7 +59,7 @@ const APIController = (function() {
         return data;
     };
 
-    const _getFeatures = async(token, id) => {
+    const _getFeatures = async (token, id) => {
         const result = await fetch(`https://api.spotify.com/v1/audio-features/${id}`, {
             method: 'GET',
             headers: { 'Authorization': 'Bearer ' + token },
@@ -97,13 +97,13 @@ const APIController = (function() {
 
 
 function getHashParams() {
-var hashParams = {};
-var e, r = /([^&;=]+)=?([^&;]*)/g,
-    q = window.location.hash.substring(1);
-while ( e = r.exec(q)) {
-    hashParams[e[1]] = decodeURIComponent(e[2]);
-}
-return hashParams;
+    var hashParams = {};
+    var e, r = /([^&;=]+)=?([^&;]*)/g,
+        q = window.location.hash.substring(1);
+    while (e = r.exec(q)) {
+        hashParams[e[1]] = decodeURIComponent(e[2]);
+    }
+    return hashParams;
 }
 
 
@@ -129,7 +129,7 @@ function heuristic(songs) {
         avgFeatures.valence += song.valence;
         avgFeatures.instrumentalness += (song.instrumentalness > .5 ? 1 : 0);
     }
-    
+
     for (let item in avgFeatures) {
         avgFeatures[item] = parseFloat((avgFeatures[item] / numItems).toFixed(5));//Change this line
     }
@@ -140,26 +140,43 @@ function heuristic(songs) {
 
     //Find the attribute (within set1) that is most representative across all songs
 
-    let max = Math.max(...Object.values(avgFeatures));    
-    var maxAttr =  Object.keys(avgFeatures).filter(attr =>   avgFeatures[attr] == max);
-    return {attr: maxAttr[0], val: max};
+    let max = Math.max(...Object.values(avgFeatures));
+    var maxAttr = Object.keys(avgFeatures).filter(attr => avgFeatures[attr] == max);
+    return { attr: maxAttr[0], val: max };
 }
 
-function displaySongs(songs, count=50, start = 0) {
+function displaySongs(songs, count = 50, start = 0) {
     for (let i = start; i < count; i++) {
-        var album = (songs[i].album.name.length < 35 ? songs[i].album.name : songs[i].album.name.substring(0, 35)+"...");;
         var cover = songs[i].album.images[1].url;
-        var artist = (songs[i].artists[0].name.length < 35 ? songs[i].artists[0].name : songs[i].artists[0].name.substring(0, 35)+"...");;
-        var track = (songs[i].name.length < 35 ? songs[i].name : songs[i].name.substring(0, 35)+"...");
-        var boxElement = `<div class='songInfo'><img src=${cover} class='songTile'><br>Track: ${track}<br>Artist: ${artist}<br>Album: ${album}<br></div>` 
+        var song = songs[i].preview_url
+        var artist = (songs[i].artists[0].name.length < 35 ? songs[i].artists[0].name : songs[i].artists[0].name.substring(0, 35) + "...");
+        var track = (songs[i].name.indexOf('(') == -1 ?  songs[i].name.substring(0, 35) : songs[i].name.substring(0, songs[i].name.indexOf('(')));
+        var boxElement = 
+        `<div class='songInfo' onClick='createModal(${i})'>
+        <img src=${cover} class='songTile' onmouseover="PlaySound('sound${i}')" onmouseout="StopSound('sound${i}')"><br>
+        Track: ${track}<br>
+        Artist: ${artist}<br>
+        <audio id = 'sound${i}' src='${song}'>
+        </div>`
         document.getElementById('songList').insertAdjacentHTML('beforeend', boxElement);
-        
+
     }
+}
+
+function PlaySound(soundobj) {
+    var thissound=document.getElementById(soundobj);
+    thissound.play();
+}
+
+function StopSound(soundobj) {
+    var thissound=document.getElementById(soundobj);
+    thissound.pause();
+    thissound.currentTime = 0;
 }
 
 function undergroundPick(songs) {
     var min = 100;
-    var  minIndex = -1;
+    var minIndex = -1;
     for (let i in songs) {
         if (songs[i].popularity < min) {
             min = songs[i].popularity;
@@ -173,8 +190,8 @@ function sortSongs(songs, attribute) {
     if (!Array.isArray(songs)) {
         songs = Object.values(songs);
     }
-    songs.sort(function(a, b) {
-        if  (a.audio_features[attribute] < b.audio_features[attribute]) {
+    songs.sort(function (a, b) {
+        if (a.audio_features[attribute] < b.audio_features[attribute]) {
             return 1;
         }
         else if (a.audio_features[attribute] > b.audio_features[attribute]) {
@@ -185,13 +202,13 @@ function sortSongs(songs, attribute) {
     return songs;
 }
 
-function displayPlaylists(playlists, count=20, start = 0) {
+function displayPlaylists(playlists, count = 20, start = 0) {
     for (let i = start; i < count; i++) {
         var id = playlists[i].id;
         var cover = (playlists[i].images.length > 1 ? playlists[i].images[1].url : playlists[i].images[0].url);
         var name = playlists[i].name;
         var owner = playlists[i].owner.display_name;
-        var boxElement = `<div class='songInfo' id='playlist${i}'><img src=${cover} class='playlistTile link' onClick='getPlaylist("${id}")'><br>Name: ${name}<br>Owner: ${owner}<br></div>` 
+        var boxElement = `<div class='songInfo' id='playlist${i}'><img src=${cover} class='playlistTile link' onClick='getPlaylist("${id}")'><br>Name: ${name}<br>Owner: ${owner}<br></div>`
         document.getElementById('playlistList').insertAdjacentHTML('beforeend', boxElement);
     }
 
@@ -199,7 +216,7 @@ function displayPlaylists(playlists, count=20, start = 0) {
 async function getPlaylist(id) {
     if (!sessionStorage["token"]) {
         var access_token = getHashParams().access_token;
-        sessionStorage["token"] = access_token;                 
+        sessionStorage["token"] = access_token;
     } else {
         var access_token = sessionStorage["token"];
     }
@@ -208,7 +225,7 @@ async function getPlaylist(id) {
     var ids = '';
     for (index in playlistSongs) {
         playlistSongs[index] = playlistSongs[index].track;
-        ids += playlistSongs[index].id+",";
+        ids += playlistSongs[index].id + ",";
     }
     var features = await APIController.multiFeatures(access_token, ids);
     features = features['audio_features'];
@@ -216,5 +233,5 @@ async function getPlaylist(id) {
         playlistSongs[index]['audio_features'] = features[index];
     }
     sessionStorage["songs"] = JSON.stringify(playlistSongs);
-    window.location.href="Results.html"
+    window.location.href = "Results.html"
 }

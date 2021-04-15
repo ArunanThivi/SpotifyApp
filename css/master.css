@@ -37,7 +37,7 @@ a {
 #songList {
   display: flex;
   justify-content: space-around;
-  margin-top: 30vh;
+  /*margin-top: 30vh;*/
   flex-wrap: wrap;
   
 }
@@ -52,6 +52,11 @@ a {
 
 .songInfo {
   margin: 20px;
+}
+
+.songTile {
+  width: auto;
+  height: auto;
 }
 
 #playlistList {
@@ -72,3 +77,5 @@ a {
 .link {
   cursor: pointer;
 }
+
+/*END OF MY WORK*/

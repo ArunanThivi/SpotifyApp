@@ -22,12 +22,12 @@
             if (window.location.search.indexOf('error') != -1) {
                     window.location.href = "index.html";
             }
-            if (!sessionStorage["token"]) {
+            if (!localStorage["token"]) {
                 var access_token = getHashParams().access_token;
             } else {
-                var access_token =sessionStorage["token"];
+                var access_token =localStorage["token"];
             }
-            if (!sessionStorage["songs"]) {
+            if (!localStorage["songs"]) {
                 var songs = await APIController.topTracks(access_token);
                 songs = songs.items;
                 ids = '';
@@ -39,9 +39,9 @@
                 for (index in features['audio_features']) {
                     songs[index]['audio_features'] = features['audio_features'][index];
                 }
-                sessionStorage["songs"] = JSON.stringify(songs);
+                localStorage["songs"] = JSON.stringify(songs);
             } else {
-                var songs = JSON.parse(sessionStorage["songs"]);
+                var songs = JSON.parse(localStorage["songs"]);
             }
             
             var topStat = heuristic(songs);

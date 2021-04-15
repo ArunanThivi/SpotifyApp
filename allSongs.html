@@ -1,18 +1,115 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <link rel="stylesheet" href="css/master.css">
-    </head>
-    <body>
-        <div id='songList'>
+
+<head>
+    <link rel="stylesheet" href="css/master.css">
+    <style>
+        * {
+            font-family: Helvetica, 'sans-serif';
+        }
+
+        .modal {
+            display: none;
+            /* Hidden by default */
+            position: fixed;
+            /* Stay in place */
+            z-index: 999;
+            /* Sit on top */
+            padding-top: 10%;
+            /* Location of the box */
+            left: 0;
+            top: 0;
+            width: 100%;
+            /* Full width */
+            height: 100%;
+            /* Full height */
+            overflow: auto;
+            /* Enable scroll if needed */
+            background-color: rgb(0, 0, 0);
+            /* Fallback color */
+            background-color: rgba(0, 0, 0, 0.4);
+            /* Black w/ opacity */
+        }
+
+        /* Modal Content */
+        .modal-content {
+            background-color: #fefefe;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #888;
+            border-radius: 10px;
+            width: 50%;
+        }
+
+        /* The Close Button */
+        .close {
+            color: #aaaaaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: #000;
+            text-decoration: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <div id='songList'>
+    </div>
+        <div id="myModal" class="modal">
+
+            <!-- Modal content -->
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <p id='modal-text'>Some text in the Modal..</p>
+            </div>
 
         </div>
-        <script src='js/app.js'></script>
-        <script>
-            console.log(sessionStorage);
-            var songs = JSON.parse(sessionStorage["songs"]);
-            displaySongs(songs, songs.length);
-        </script>
-    </body>
+    <script src='js/app.js'></script>
+    <script>
+        var songs = JSON.parse(localStorage["songs"]);
+        console.log(songs)
+        displaySongs(songs, songs.length);
+
+        var modal = document.getElementById("myModal");
+        var span = document.getElementsByClassName("close")[0];
+        
+        var createModal = function(i) {
+            console.log("TEST")
+            document.getElementById('modal-text').innerHTML = `            
+            <img src='${songs[i].album.images[1].url}' class='songTile' style="float: right"><br><br>
+            Title: ${songs[i].name}<br><br>
+            Artist: ${songs[i].artists[0].name}<br><br>
+            Album: ${songs[i].album.name}<br><br> 
+            Popularity: ${songs[i].popularity}<br><br>
+            Acousticness: ${Math.round(songs[i].audio_features.acousticness*100)}/100<br><br>
+            Danceability: ${Math.round(songs[i].audio_features.danceability*100)}/100<br><br>
+            Energy: ${Math.round(songs[i].audio_features.energy*100)}/100<br><br>
+            Valence: ${Math.round(songs[i].audio_features.valence*100)}/100<br><br>
+            Tempo: ${Math.round(songs[i].audio_features.tempo)} BPM<br><br>
+            Instrumentalness: ${Math.round(songs[i].audio_features.instrumentalness*100)}/100<br><br>
+            Liveness: ${Math.round(songs[i].audio_features.liveness*100)}/100<br><br>`;
+            console.log(songs[i].album.images[1].url);
+            modal.style.display = "block";
+        }
+
+        span.onclick = function () {
+            modal.style.display = "none";
+        }
+
+        // When the user clicks anywhere outside of the modal, close it
+        window.onclick = function (event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }        
+
+    </script>
+</body>
 
 </html>
