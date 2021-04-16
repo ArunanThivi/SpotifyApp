@@ -9,7 +9,6 @@
         }
 
         h2 {
-            color: black;
             display: block;
             font-size: 1.5em;
             margin-top: 0.83em;
@@ -118,22 +117,26 @@
     <div id="myModal" class="modal">
 
         <!-- Modal content -->
-        <div class="modal-content">
+        <div class="modal-content" id='modal-content'>
             <span class="close" onclick="modal.style.display = 'none';">&times;</span>
             <p id='modal-text'>Some text in the Modal..</p>
         </div>
 
     </div>
-
+    <script src="js/jquery.min.js"></script>
+    <script src="js/imgcolr.html5.min.js"></script>
+    <script src="js/tinycolor.js"></script>
     <script src='js/app.js'></script>
-
     <script>
         var songs = JSON.parse(localStorage["songs"]);
         console.log(songs)
         displaySongs(songs, songs.length);
 
-        var modal = document.getElementById("myModal");
-
+        var modal = document.getElementById("myModal");/*
+        imgs.imgcolr(function (img, color) {
+            console.log(img);
+            console.log(color);
+        });*/
         // When the user clicks anywhere outside of the modal, close it
         window.onclick = function (event) {
             if (event.target == modal) {

@@ -89,6 +89,13 @@ const APIController = (function () {
         return data;
     }
 
+    /*const _color = async (url) {
+        const result = await fetch(`http://apicloud-colortag.p.mashape.com/tag-url.json` , {
+            method: 'GET',
+            headers: {}
+        })
+    }*/
+
     return {
         getFeatures(token, trackId) {
             return _getFeatures(token, trackId);
@@ -259,9 +266,9 @@ async function getPlaylist(id) {
 }
 
 var createModal = function (i) {
-    console.log("TEST")
+    
     document.getElementById('modal-text').innerHTML = `            
-    <img src='${songs[i].album.images[1].url}' style="float: right"  onmouseover="PlaySound('sound${i}')" onmouseout="StopSound('sound${i}')">
+    <img src='${songs[i].album.images[1].url}' style="float: right"  onmouseover="PlaySound('sound${i}')" id='modalTile' onmouseout="StopSound('sound${i}')">
     <h1>${songs[i].name}</h1>
     <h2>${songs[i].artists[0].name}</h2>
     <h3>Album: ${songs[i].album.name}</h3>
@@ -273,7 +280,25 @@ var createModal = function (i) {
     Tempo: ${Math.round(songs[i].audio_features.tempo)} BPM<br><br>
     Instrumentalness: ${Math.round(songs[i].audio_features.instrumentalness * 100)}/100<br><br>
     Liveness: ${Math.round(songs[i].audio_features.liveness * 100)}/100<br><br>`;
-    console.log(songs[i].album.images[1].url);
+    var img = $('#modalTile');
+    console.log(modal);                
+    img.imgcolr(function (img, color) {
+        var modalBox = document.getElementById("modal-content");
+        modalBox.style.backgroundColor = color;
+        console.log(color);
+        var tiny = tinycolor(color);
+        console.log(tiny.getBrightness());
+        if (!tiny.isValid()) {
+            console.log("PROBLEM!!!!")
+        }
+        if (tiny.getBrightness() < 100) {
+            modalBox.style['color'] = "white";
+        } else {
+            modalBox.style['color'] = "black";
+        }
+    });
+    
+
     modal.style.display = "block";
 }
 
