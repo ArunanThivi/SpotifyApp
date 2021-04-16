@@ -4,15 +4,33 @@
 <head>
     <link rel="stylesheet" href="css/master.css">
     <style>
+        html {
+            background-color: #FCE1FF;
+        }
+
+        h2 {
+            color: black;
+            display: block;
+            font-size: 1.5em;
+            margin-top: 0.83em;
+            margin-bottom: 0.83em;
+            margin-left: 0;
+            margin-right: 0;
+            font-weight: bold;
+        }
+
         * {
             font-family: Helvetica, 'sans-serif';
         }
+
         #buttons {
             margin-left: 5%;
         }
+
         .btn {
             background-color: white;
             border: 2px solid #008CBA;
+            border-radius: 20px;
             color: black;
             padding: 15px 32px;
             text-align: center;
@@ -80,13 +98,17 @@
 </head>
 
 <body>
+    <span style="cursor: pointer; font-size: 50px; margin-left: 1%" onclick="window.close()">&times;</span>
     <div id="buttons">
-        <button class="btn" id="btn-original" onclick="originalSort(songs)">Sort by Most Played</button>
+        <button class="btn" id="btn-original" onclick="originalSort(songs)">Sort by Playlist Order</button>
         <button class="btn" id="btn-popular" onclick="sortedPopularity(songs)">Sort by Popularity</button>
-        <button class="btn" id="btn-acousticness" onclick="displaySorted(songs, 'acousticness')">Sort by Acousticness</button>
-        <button class="btn" id="btn-danceability" onclick="displaySorted(songs, 'danceability')">Sort by Danceability</button>
+        <button class="btn" id="btn-acousticness" onclick="displaySorted(songs, 'acousticness')">Sort by
+            Acousticness</button>
+        <button class="btn" id="btn-danceability" onclick="displaySorted(songs, 'danceability')">Sort by
+            Danceability</button>
         <button class="btn" id="btn-energy" onclick="displaySorted(songs, 'energy')">Sort by Energy</button>
-        <button class="btn" id="btn-instrumentalness" onclick="displaySorted(songs, 'instrumentalness')">Sort by Instrumentalness</button>
+        <button class="btn" id="btn-instrumentalness" onclick="displaySorted(songs, 'instrumentalness')">Sort by
+            Instrumentalness</button>
         <button class="btn" id="btn-valence" onclick="displaySorted(songs, 'valence')">Sort by Valence</button>
         <button class="btn" id="btn-tempo" onclick="displaySorted(songs, 'tempo')">Sort by Tempo</button>
     </div>

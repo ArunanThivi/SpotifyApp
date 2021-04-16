@@ -3,7 +3,8 @@
     <head>
         <link rel="stylesheet" href="css/Results.css">
     </head>
-    <body>        
+    <body>
+        <span style="cursor: pointer; font-size: 50px; margin-left: 1%" onclick="window.location.href = 'index.html';">&leftarrow;</span>        
         <div id='mainFeature'>
         </div>
         <div id='songsDiv'>
@@ -28,18 +29,37 @@
                 var access_token =localStorage["token"];
             }
             if (!localStorage["songs"]) {
+                //0 - 49
                 var songs = await APIController.topTracks(access_token);
-                songs = songs.items;
+                //songs = songs.items;
                 ids = '';
                 for (index in songs) {
-                    songs[index]['original'] = parseInt(index, 10);
+                    //
                     ids += songs[index].id+','
                 }
-                var features = await APIController.multiFeatures(access_token, ids);
+                ids = ids.slice(0, -1);
+                songs = await APIController.getTracks(access_token, ids);
+                songs = songs.tracks;
+                //50 - 99
+                var songs2 = await APIController.topTracks(access_token, 49);
 
-                for (index in features['audio_features']) {
-                    songs[index]['audio_features'] = features['audio_features'][index];
+                var ids2 = '';
+                for (index in songs2) {
+                    ids2 += songs2[index].id+','
                 }
+                ids2 = ids2.slice(0, -1);
+                songs2 = await APIController.getTracks(access_token, ids2);
+                songs = songs.concat(songs2.tracks.slice(1));
+                for (index in songs) {
+                    songs[index]['original'] = parseInt(index, 10);
+                }
+                var features = await APIController.multiFeatures(access_token, ids+','+ids2);
+                features = features['audio_features'];
+                features.splice(50, 1);
+                for (index in features) {
+                    songs[index]['audio_features'] = features[index];
+                }
+                console.log(songs);
                 localStorage["songs"] = JSON.stringify(songs);
             } else {
                 var songs = JSON.parse(localStorage["songs"]);
@@ -86,7 +106,7 @@
                 case 'valence':
                     document.body.style.backgroundColor = "#ff61ed";
                     document.body.style.color = "black";
-                    document.getElementById('mainFeature').insertAdjacentHTML("afterbegin", "<h2>Our Analysis Determined that you like to be</h2>");
+                    document.getElementById('mainFeature').insertAdjacentHTML("afterbegin", "<h2>Our Analysis Determined that you like your music</h2>");
                     document.getElementById('mainFeature').insertAdjacentHTML("beforeend", "<h1>Positive!</h1>");
                     break;
             }

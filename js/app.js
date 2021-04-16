@@ -20,7 +20,7 @@ const APIController = (function () {
     }
 
     const _getPlaylistSongs = async (token, playlistId) => {
-        const result = await fetch(`https://api.spotify.com/v1/playlists/${playlistId}/tracks?fields=items(track)&limit=50`, {
+        const result = await fetch(`https://api.spotify.com/v1/playlists/${playlistId}/tracks?market=US&fields=items(track)`, {
             method: 'GET',
             headers: { 'Authorization': 'Bearer ' + token },
         });
@@ -28,14 +28,24 @@ const APIController = (function () {
         return data;
     }
 
-    const _topTracks = async (token) => {
-        const result = await fetch(`https://api.spotify.com/v1/me/top/tracks?limit=50`, {
-            method: 'GET',
-            headers: { 'Authorization': 'Bearer ' + token },
-        });
+    const _topTracks = async (token, offset = 0) => {
+        if (offset == 0) {
+            let result = await fetch(`https://api.spotify.com/v1/me/top/tracks?limit=50`, {
+                method: 'GET',
+                headers: { 'Authorization': 'Bearer ' + token },
+            });
 
-        const data = await result.json();
-        return data;
+            let data = await result.json();
+            return data.items;
+        } else {
+            let result = await fetch(`https://api.spotify.com/v1/me/top/tracks?limit=50&offset=${offset}`, {
+                method: 'GET',
+                headers: { 'Authorization': 'Bearer ' + token },
+            });
+
+            let data = await result.json();
+            return data.items;
+        }
     }
 
     const _searchTrack = async (token, name) => {
@@ -69,6 +79,16 @@ const APIController = (function () {
         return data;
     }
 
+    const _getTracks = async (token, ids) => {
+        const result = await fetch(`https://api.spotify.com/v1/tracks?ids=${ids}&market=US`, {
+            method: 'GET',
+            headers: { 'Authorization': 'Bearer ' + token },
+        });
+
+        const data = await result.json();
+        return data;
+    }
+
     return {
         getFeatures(token, trackId) {
             return _getFeatures(token, trackId);
@@ -82,14 +102,19 @@ const APIController = (function () {
         getProfile(token) {
             return _getProfile(token);
         },
-        topTracks(token) {
-            return _topTracks(token);
+        topTracks(token, offset) {
+            return _topTracks(token, offset);
         },
         getPlaylists(token) {
             return _getPlaylists(token);
         },
         getPlaylistSongs(token, playlistId) {
             return _getPlaylistSongs(token, playlistId);
+        },
+
+        getTracks(token, ids) {
+            return _getTracks(token, ids);
+
         }
     }
 
@@ -108,6 +133,7 @@ function getHashParams() {
 
 
 function heuristic(songs) {
+    //console.log(songs);
     var numItems = Object.keys(songs).length;
     //Calcuate the Average score for every feature across all songs
     avgFeatures = {
@@ -149,8 +175,8 @@ function displaySongs(songs, count = 50, start = 0) {
     for (let i = start; i < count; i++) {
         var cover = songs[i].album.images[1].url;
         var song = songs[i].preview_url
-        var boxElement = 
-        `<div class='songInfo' onClick='createModal(${i})'>
+        var boxElement =
+            `<div class='songInfo' onClick='createModal(${i})'>
         <img src=${cover} class='songTile' onmouseover="PlaySound('sound${i}')" onmouseout="StopSound('sound${i}')"><br>
         <audio id = 'sound${i}' src='${song}'>
         </div>`
@@ -160,12 +186,12 @@ function displaySongs(songs, count = 50, start = 0) {
 }
 
 function PlaySound(soundobj) {
-    var thissound=document.getElementById(soundobj);
+    var thissound = document.getElementById(soundobj);
     thissound.play();
 }
 
 function StopSound(soundobj) {
-    var thissound=document.getElementById(soundobj);
+    var thissound = document.getElementById(soundobj);
     thissound.pause();
     thissound.currentTime = 0;
 }
@@ -210,11 +236,11 @@ function displayPlaylists(playlists, count = 20, start = 0) {
 
 }
 async function getPlaylist(id) {
-    if (!sessionStorage["token"]) {
+    if (!localStorage["token"]) {
         var access_token = getHashParams().access_token;
-        sessionStorage["token"] = access_token;
+        localStorage["token"] = access_token;
     } else {
-        var access_token = sessionStorage["token"];
+        var access_token = localStorage["token"];
     }
     playlistSongs = await APIController.getPlaylistSongs(access_token, id);
     playlistSongs = playlistSongs.items;
@@ -228,17 +254,17 @@ async function getPlaylist(id) {
     for (index in playlistSongs) {
         playlistSongs[index]['audio_features'] = features[index];
     }
-    sessionStorage["songs"] = JSON.stringify(playlistSongs);
+    localStorage["songs"] = JSON.stringify(playlistSongs);
     window.location.href = "Results.html"
 }
 
 var createModal = function (i) {
     console.log("TEST")
     document.getElementById('modal-text').innerHTML = `            
-    <img src='${songs[i].album.images[1].url}' style="float: right"  onmouseover="PlaySound('sound${i}')" onmouseout="StopSound('sound${i}')"><br><br>
-    Title: ${songs[i].name}<br><br>
-    Artist: ${songs[i].artists[0].name}<br><br>
-    Album: ${songs[i].album.name}<br><br> 
+    <img src='${songs[i].album.images[1].url}' style="float: right"  onmouseover="PlaySound('sound${i}')" onmouseout="StopSound('sound${i}')">
+    <h1>${songs[i].name}</h1>
+    <h2>${songs[i].artists[0].name}</h2>
+    <h3>Album: ${songs[i].album.name}</h3>
     Popularity: ${songs[i].popularity}<br><br>
     Acousticness: ${Math.round(songs[i].audio_features.acousticness * 100)}/100<br><br>
     Danceability: ${Math.round(songs[i].audio_features.danceability * 100)}/100<br><br>
