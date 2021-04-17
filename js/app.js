@@ -167,9 +167,6 @@ function heuristic(songs) {
         avgFeatures[item] = parseFloat((avgFeatures[item] / numItems).toFixed(5));//Change this line
     }
     //Adjust the skews in the data set to get a normal standard distribution.
-    avgFeatures.danceability -= .125;
-    avgFeatures.energy -= .225;
-    avgFeatures.valence += .05;
 
     //Find the attribute (within set1) that is most representative across all songs
 
@@ -178,15 +175,29 @@ function heuristic(songs) {
     return { attr: maxAttr[0], val: max };
 }
 
-function displaySongs(songs, count = 50, start = 0) {
+function displaySongs(songs, count = 50, start = 0, results = false) {
+    console.log(songs);
     for (let i = start; i < count; i++) {
         var cover = songs[i].album.images[1].url;
         var song = songs[i].preview_url
-        var boxElement =
+        if (results == true) {
+            var artist = songs[i].artists[0].name.substring(0, 35);
+            var track = (songs[i].name.indexOf('(') == -1 ?  songs[i].name.substring(0, 35) : songs[i].name.substring(0, songs[i].name.indexOf('(')));
+            var boxElement =
             `<div class='songInfo' onClick='createModal(${i})'>
-        <img src=${cover} class='songTile' onmouseover="PlaySound('sound${i}')" onmouseout="StopSound('sound${i}')"><br>
-        <audio id = 'sound${i}' src='${song}'>
-        </div>`
+            <img src=${cover} class='songTile' onmouseover="PlaySound('sound${i}')" onmouseout="StopSound('sound${i}')"><br>
+            <p style="margin: 0px; text-align: center; font-size: 20px">${track}</p>
+            <p style="margin: 0px; text-align: center; font-size: 18px">Artist: ${artist}</p><br>
+            <audio id = 'sound${i}' src='${song}'>
+            </div>`
+        }
+        else {
+            var boxElement =
+                `<div class='songInfo' onClick='createModal(${i})'>
+            <img src=${cover} class='songTile' onmouseover="PlaySound('sound${i}')" onmouseout="StopSound('sound${i}')"><br>
+            <audio id = 'sound${i}' src='${song}'>
+            </div>`
+        }
         document.getElementById('songList').insertAdjacentHTML('beforeend', boxElement);
 
     }
@@ -202,9 +213,18 @@ function StopSound(soundobj) {
     thissound.pause();
     thissound.currentTime = 0;
 }
+function obscurity(songs) {
+    let score = 0
+    for (let i in songs)  {
+        if (songs[i].popularity < 50) {
+            score += 1;
+        }
+    }
+    return score;
+}
 
 function undergroundPick(songs) {
-    var min = 100;
+    var min = 101;
     var minIndex = -1;
     for (let i in songs) {
         if (songs[i].popularity < min) {
