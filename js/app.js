@@ -28,9 +28,9 @@ const APIController = (function () {
         return data;
     }
 
-    const _topTracks = async (token, offset = 0) => {
+    const _topTracks = async (token, time, offset = 0) => {
         if (offset == 0) {
-            let result = await fetch(`https://api.spotify.com/v1/me/top/tracks?limit=50`, {
+            let result = await fetch(`https://api.spotify.com/v1/me/top/tracks?time_range=${time}_term&limit=50`, {
                 method: 'GET',
                 headers: { 'Authorization': 'Bearer ' + token },
             });
@@ -38,7 +38,7 @@ const APIController = (function () {
             let data = await result.json();
             return data.items;
         } else {
-            let result = await fetch(`https://api.spotify.com/v1/me/top/tracks?limit=50&offset=${offset}`, {
+            let result = await fetch(`https://api.spotify.com/v1/me/top/tracks?time_range=${time}_term&limit=50&offset=${offset}`, {
                 method: 'GET',
                 headers: { 'Authorization': 'Bearer ' + token },
             });
@@ -109,8 +109,8 @@ const APIController = (function () {
         getProfile(token) {
             return _getProfile(token);
         },
-        topTracks(token, offset) {
-            return _topTracks(token, offset);
+        topTracks(token, time, offset) {
+            return _topTracks(token, time, offset);
         },
         getPlaylists(token) {
             return _getPlaylists(token);
@@ -176,29 +176,40 @@ function heuristic(songs) {
 }
 
 function displaySongs(songs, count = 50, start = 0, results = false) {
-    console.log(songs);
     for (let i = start; i < count; i++) {
         var cover = songs[i].album.images[1].url;
         var song = songs[i].preview_url
+        var box = document.createElement("div");
+        box.onclick = function () { createModal(i); };
+        box.className = 'songInfo';
+        var image = document.createElement("img");
+        image.src = cover;
+        image.className = "songTile";
+        image.onmouseover = function () { PlaySound(`sound${i}`) }
+        image.onmouseout = function () { StopSound(`sound${i}`) };
+        box.appendChild(image);
         if (results == true) {
-            var artist = songs[i].artists[0].name.substring(0, 35);
-            var track = (songs[i].name.indexOf('(') == -1 ?  songs[i].name.substring(0, 35) : songs[i].name.substring(0, songs[i].name.indexOf('(')));
-            var boxElement =
-            `<div class='songInfo' onClick='createModal(${i})'>
-            <img src=${cover} class='songTile' onmouseover="PlaySound('sound${i}')" onmouseout="StopSound('sound${i}')"><br>
-            <p style="margin: 0px; text-align: center; font-size: 20px">${track}</p>
-            <p style="margin: 0px; text-align: center; font-size: 18px">Artist: ${artist}</p><br>
-            <audio id = 'sound${i}' src='${song}'>
-            </div>`
+            var artistName = songs[i].artists[0].name.substring(0, 35);
+            var trackName = (songs[i].name.indexOf('(') == -1 ? songs[i].name.substring(0, 35) : songs[i].name.substring(0, songs[i].name.indexOf('(')));
+            var artist = document.createElement('p');
+            var track = document.createElement('p');
+            artist.appendChild(document.createTextNode(artistName))
+            track.appendChild(document.createTextNode(trackName))
+            artist.style.margin = "0px";
+            track.style.margin = "0px";
+            artist.style.textAlign = "center";
+            artist.style.fontSize = "20px"
+            track.style.textAlign = "center";
+            track.style.fontSize = "18px"
+            box.appendChild(artist);
+            box.appendChild(track);
         }
-        else {
-            var boxElement =
-                `<div class='songInfo' onClick='createModal(${i})'>
-            <img src=${cover} class='songTile' onmouseover="PlaySound('sound${i}')" onmouseout="StopSound('sound${i}')"><br>
-            <audio id = 'sound${i}' src='${song}'>
-            </div>`
-        }
-        document.getElementById('songList').insertAdjacentHTML('beforeend', boxElement);
+        var music = document.createElement("audio");
+        music.src = song;
+        music.id = `sound${i}`;
+        box.appendChild(music);
+        document.getElementById('songList').appendChild(box);
+
 
     }
 }
@@ -215,7 +226,7 @@ function StopSound(soundobj) {
 }
 function obscurity(songs) {
     let score = 0
-    for (let i in songs)  {
+    for (let i in songs) {
         if (songs[i].popularity < 50) {
             score += 1;
         }
@@ -232,7 +243,7 @@ function undergroundPick(songs) {
             minIndex = i;
         }
     }
-    return songs[minIndex];
+    return [minIndex, songs[minIndex]];
 }
 
 function sortSongs(songs, attribute) {
@@ -252,17 +263,36 @@ function sortSongs(songs, attribute) {
 }
 
 function displayPlaylists(playlists, count = 20, start = 0) {
+    
+    console.log('test')
+    console.log(playlists)
     for (let i = start; i < count; i++) {
+        if (playlists[i].images.length < 1){
+            continue;
+        }
         var id = playlists[i].id;
         var cover = (playlists[i].images.length > 1 ? playlists[i].images[1].url : playlists[i].images[0].url);
         var name = playlists[i].name;
         var owner = playlists[i].owner.display_name;
         var boxElement = `<div class='songInfo' id='playlist${i}'><img src=${cover} class='playlistTile link' onClick='getPlaylist("${id}")'><br>Name: ${name}<br>Owner: ${owner}<br></div>`
         document.getElementById('playlistList').insertAdjacentHTML('beforeend', boxElement);
+        // var box = document.createElement('div');
+        // box.className = "songInfo";
+        // box.id = `playlist${i}`;
+        // var image = document.createElement("img");
+        // image.src = cover;
+        // image.className = 'playlistTile link';
+        // console.log("POOP")
+        // image.onclick = getPlaylist(id);
+        // box.appendChild(image);
+        // box.innerHTML += `<br>Name: ${name}<br>Owner: ${owner}<br>`
+        // document.getElementById('playlistList').appendChild(box);
+    
     }
 
 }
 async function getPlaylist(id) {
+    console.log()
     if (!localStorage["token"]) {
         var access_token = getHashParams().access_token;
         localStorage["token"] = access_token;
@@ -286,8 +316,7 @@ async function getPlaylist(id) {
 }
 
 var createModal = function (i) {
-    
-    document.getElementById('modal-text').innerHTML = `            
+    document.getElementById('modal-text').innerHTML = `
     <img src='${songs[i].album.images[1].url}' style="float: right"  onmouseover="PlaySound('sound${i}')" id='modalTile' onmouseout="StopSound('sound${i}')">
     <h1>${songs[i].name}</h1>
     <h2>${songs[i].artists[0].name}</h2>
@@ -301,7 +330,7 @@ var createModal = function (i) {
     Instrumentalness: ${Math.round(songs[i].audio_features.instrumentalness * 100)}/100<br><br>
     Liveness: ${Math.round(songs[i].audio_features.liveness * 100)}/100<br><br>`;
     var img = $('#modalTile');
-    console.log(modal);                
+    console.log(modal);
     img.imgcolr(function (img, color) {
         var modalBox = document.getElementById("modal-content");
         modalBox.style.backgroundColor = color;
@@ -317,7 +346,7 @@ var createModal = function (i) {
             modalBox.style['color'] = "black";
         }
     });
-    
+
 
     modal.style.display = "block";
 }
@@ -387,4 +416,40 @@ function sortedPopularity(songs) {
 
 function clearSongs() {
     document.getElementById("songList").innerHTML = "";
+}
+
+
+
+async function getSongs(access_token, time) {
+    //0 - 49
+    var songs = await APIController.topTracks(access_token, time);
+    //songs = songs.items;
+    ids = '';
+    for (index in songs) {
+        //
+        ids += songs[index].id + ','
+    }
+    ids = ids.slice(0, -1); //Cut last ',' in ids
+    songs = await APIController.getTracks(access_token, ids);
+    songs = songs.tracks;
+    //50 - 99
+    var songs2 = await APIController.topTracks(access_token, time, 49);
+
+    var ids2 = '';
+    for (index in songs2) {
+        ids2 += songs2[index].id + ','
+    }
+    ids2 = ids2.slice(0, -1); //Cut last ',' in ids2
+    songs2 = await APIController.getTracks(access_token, ids2);
+    songs = songs.concat(songs2.tracks.slice(1));
+    for (index in songs) {
+        songs[index]['original'] = parseInt(index, 10);
+    }
+    var features = await APIController.multiFeatures(access_token, ids + ',' + ids2);
+    features = features['audio_features'];
+    features.splice(50, 1);
+    for (index in features) {
+        songs[index]['audio_features'] = features[index];
+    }
+    return songs;
 }

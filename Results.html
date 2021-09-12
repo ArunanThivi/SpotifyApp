@@ -2,23 +2,42 @@
 <html>
     <head>
         <link rel="stylesheet" href="css/Results.css">
+        <style>
+        </style>
     </head>
     <body>
         <span style="cursor: pointer; font-size: 50px; margin-left: 1%" onclick="window.location.href = 'index.html';">&leftarrow;</span>        
         <div id='mainFeature'>
         </div>
-        <div id='songsDiv'>
-            <p>Here are some of the songs used to make your Feature Profile:</p>
-            <div id='songList'>
+        <div id='moreInfo'>
+            <div id='songsDiv'>
+                <p style="margin: .5em; text-align: center; font-size: 50px;">Here are some of the songs used to make your Feature Profile:</p>
+                <div id='songList'>
+                </div>
+                <a href="allSongs.html" target="_blank" id='totalSongs'>View the rest of your top songs here!</a>
             </div>
-            <a href="allSongs.html" target="_blank" id='totalSongs'>View the rest of your top songs here!</a>
+            <div id='underground'><h2> Your Underground Track is</h2></div>
+                <p style="font-size: 40px; text-align: center;">Tell your Friends about this track!</p>
         </div>
-        <div id='underground'>
-            <p>Tell your Friends about this track!</p>
+
+        <div id="myModal" class="modal">
+
+            <!-- Modal content -->
+            <div class="modal-content" id='modal-content'>
+                <span class="close" onclick="modal.style.display = 'none';">&times;</span>
+                <p id='modal-text'>Some text in the Modal..</p>
+            </div>
+    
         </div>
+
     </body>
+    <script src="js/jquery.min.js"></script>
+    <script src="js/imgcolr.html5.min.js"></script>
+    <script src="js/tinycolor.js"></script>
     <script src="js/app.js"></script>
     <script>
+        var songs = null;
+        var modal = document.getElementById("myModal");
         (async function() {
             if (window.location.search.indexOf('error') != -1) {
                     window.location.href = "index.html";
@@ -29,40 +48,10 @@
                 var access_token =localStorage["token"];
             }
             if (!localStorage["songs"]) {
-                //0 - 49
-                var songs = await APIController.topTracks(access_token);
-                //songs = songs.items;
-                ids = '';
-                for (index in songs) {
-                    //
-                    ids += songs[index].id+','
-                }
-                ids = ids.slice(0, -1);
-                songs = await APIController.getTracks(access_token, ids);
-                songs = songs.tracks;
-                //50 - 99
-                var songs2 = await APIController.topTracks(access_token, 49);
-
-                var ids2 = '';
-                for (index in songs2) {
-                    ids2 += songs2[index].id+','
-                }
-                ids2 = ids2.slice(0, -1);
-                songs2 = await APIController.getTracks(access_token, ids2);
-                songs = songs.concat(songs2.tracks.slice(1));
-                for (index in songs) {
-                    songs[index]['original'] = parseInt(index, 10);
-                }
-                var features = await APIController.multiFeatures(access_token, ids+','+ids2);
-                features = features['audio_features'];
-                features.splice(50, 1);
-                for (index in features) {
-                    songs[index]['audio_features'] = features[index];
-                }
-                console.log(songs);
+                songs = await getSongs(access_token, "medium")
                 localStorage["songs"] = JSON.stringify(songs);
             } else {
-                var songs = JSON.parse(localStorage["songs"]);
+                songs = JSON.parse(localStorage["songs"]);
             }
             
             var topStat = heuristic(songs);
@@ -113,9 +102,34 @@
             var sorted = sortSongs(songs, topStat.attr);
             document.getElementById('mainFeature').insertAdjacentHTML("beforeend", `<p id='subtitle'>With a confidence score of ${(topStat.val*100).toFixed(2)} / 100</p>`)
             //document.getElementById('totalSongs').addEventListener('click', allSongs());
-            displaySongs(sorted, Math.min(Object.keys(songs).length, 5));
-            var lstPopular = undergroundPick(songs);
-            document.getElementById('underground').insertAdjacentHTML('afterbegin', `<h2>Your Underground Track is<img src=${lstPopular.album.images[1].url} id='undergroundPic'><u>${lstPopular.name}</u> by <u>${lstPopular.artists[0].name}</u>!</h2>`)
-        })();
+            displaySongs(sorted, Math.min(Object.keys(songs).length, 5), 0, true);
+            var temp = undergroundPick(songs);
+            var lstPopular = temp[1]
+            var i = temp[0]
+            var undergroundDiv = document.createElement('div');
+            var underground = document.createElement('h2');
+            var undergroundImg = document.createElement("img");
+            undergroundImg.src = lstPopular.album.images[1].url;
+            undergroundImg.id = 'undergroundPic';
+            undergroundImg.onmouseover = function () { PlaySound(`sound${i}`) };
+            undergroundImg.onmouseout = function () { StopSound(`sound${i}`) };
+            undergroundImg.onclick = function () { createModal(i); };
+            var songDesc = document.createTextNode(`${lstPopular.name} by ${lstPopular.artists[0].name}!`);
+            underground.appendChild(songDesc)
+            var music = document.createElement("audio");
+            music.src = lstPopular.preview_url;
+            music.id = `sound${i}`;
+            undergroundDiv.append(undergroundImg, underground, music);
+            document.getElementById('underground').appendChild(undergroundDiv);
+            
+            //document.getElementById('underground').insertAdjacentHTML('afterbegin', `<h2>Your Underground Track is<img src=${lstPopular.album.images[1].url} id='undergroundPic'><u>${lstPopular.name}</u> by <u>${lstPopular.artists[0].name}</u>!</h2>`)
+        }
+        )();
+
+        window.onclick = function (event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
     </script>
 </html>
